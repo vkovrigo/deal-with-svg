@@ -11,11 +11,19 @@
         .origin(function(d) { return d })
         .on('drag', dragmove);
 
+    var zoom = d3.behavior.zoom()
+        .scaleExtent([1, 10])
+        .on('zoom', zoomed);
+
     var svg = d3.select('body').append('svg')
         .attr('width', canvasWidth)
         .attr('height', canvasHeight)
 
-    var newg = svg.append('g')
+    var container = svg.append('g')
+        .attr("transform", "translate(-5,-5)")
+        .call(zoom);
+
+    var newg = container.append('g')
           .data([{x: width / 2, y: height / 2}]);
 
     var dragrect = newg.append('rect')
@@ -39,9 +47,10 @@
 
     var newDrag = d3.behavior.drag()
         .origin(function(d) { return d; })
+        .on('dragstart', dragstart)
         .on('drag', newDragmove);
 
-    var group = svg.append('g')
+    var group = container.append('g')
         .data([{x: width / 10, y: height / 10}])
         .attr('fill-opacity', 0.2)
         .attr('class', 'block')
@@ -70,6 +79,10 @@
         d3.select(this).attr("transform", function(d,i){
             return "translate(" + [ d.x, d.y ] + ")";
         });
+    }
+
+    function zoomed() {
+        d3.select(this).attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
     }
 
 }(d3));
