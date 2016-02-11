@@ -9,6 +9,7 @@
 
     var drag = d3.behavior.drag()
         .origin(function(d) { return d })
+        .on('dragstart', dragstart)
         .on('drag', dragmove);
 
     var zoom = d3.behavior.zoom()
@@ -85,6 +86,10 @@
 
     function zoomed() {
         d3.select(this).attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+    }
+
+    function dragstart() {
+        d3.event.sourceEvent.stopPropagation();
     }
 
 }(d3));
