@@ -1,0 +1,37 @@
+(function(d3){
+    'use strict';
+
+    var canvasWidth = 600,
+        canvasHeight = 600;
+
+    var width = 200,
+        height = 100;
+
+    var drag = d3.behavior.drag()
+        .origin(function(d) { return d })
+        .on('drag', dragmove);
+
+    var svg = d3.select('body').append('svg')
+        .attr('width', canvasWidth)
+        .attr('height', canvasHeight)
+
+    var newg = svg.append('g')
+          .data([{x: width / 2, y: height / 2}]);
+
+    var dragrect = newg.append('rect')
+        .attr('class', 'block')
+        .attr('id', 'block-1')
+        .attr('x', function(d) { return d.x; })
+        .attr('y', function(d) { return d.y; })
+        .attr('height', height)
+        .attr('width', width)
+        .attr('fill-opacity', 0.5)
+        .call(drag);
+
+    function dragmove(d) {
+        d3.select(this)
+            .attr('x', d.x = Math.max(0, Math.min(canvasWidth - width, d3.event.x)))
+            .attr('y', d.y = Math.max(0, Math.min(canvasHeight - height, d3.event.y)));
+    }
+
+}(d3));
