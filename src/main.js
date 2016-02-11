@@ -43,6 +43,7 @@
 
     var group = svg.append('g')
         .data([{x: width / 10, y: height / 10}])
+        .attr('fill-opacity', 0.2)
         .attr('class', 'block')
         .attr('transform', function(d) {
             return 'translate(' + [ d.x, d.y ] + ')';
@@ -52,6 +53,15 @@
     var react = group.append('rect')
         .attr('height', height)
         .attr('width', width);
+
+    var fo = group.append('foreignObject')
+        .attr("height", height - 10)
+        .attr("width", width - 20);
+
+        // Add div with some text
+        fo.append('xhtml:div').text('It will take 5 minutes on Python!')
+        // Add input with predefined value
+        fo.append('xhtml:input').attr('value', 'blah-blah');
 
     function newDragmove(d) {
         d.x += d3.event.dx;
