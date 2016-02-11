@@ -71,6 +71,8 @@
         fo.append('xhtml:div').text('It will take 5 minutes on Python!')
         // Add input with predefined value
         fo.append('xhtml:input').attr('value', 'blah-blah');
+        // Add checkbox
+        fo.append('xhtml:input').attr('type', 'checkbox')
 
     function newDragmove(d) {
         d.x += d3.event.dx;
