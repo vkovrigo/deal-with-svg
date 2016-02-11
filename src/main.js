@@ -34,4 +34,18 @@
             .attr('y', d.y = Math.max(0, Math.min(canvasHeight - height, d3.event.y)));
     }
 
+
+    // Creare rect inside tag `g` and than add `foreignObject` with some html.
+
+    var group = svg.append('g')
+        .data([{x: width / 10, y: height / 10}])
+        .attr('class', 'block')
+        .attr('transform', function(d) {
+            return 'translate(' + [ d.x, d.y ] + ')';
+        });
+
+    var react = group.append('rect')
+        .attr('height', height)
+        .attr('width', width);
+
 }(d3));
