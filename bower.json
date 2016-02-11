@@ -1,0 +1,21 @@
+{
+  "name": "svg-magic",
+  "authors": [
+    "Vasili Kauryha <vkovrigo@gmail.com>"
+  ],
+  "description": "Test project for try d3",
+  "main": "index.html",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "d3": "^3.5.14"
+  }
+}
