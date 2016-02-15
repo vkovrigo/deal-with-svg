@@ -75,13 +75,24 @@
         // Add checkbox
         fo.append('xhtml:input').attr('type', 'checkbox')
 
-    function newDragmove(d) {
-        d.x += d3.event.dx;
-        d.y += d3.event.dy;
+    var dragLine = container.append('path')
+        .attr('stroke', 'red')
+        .attr('stroke-width', 6);
 
-        d3.select(this).attr("transform", function(d,i){
-            return "translate(" + [ d.x, d.y ] + ")";
-        });
+    function newDragmove(d) {
+        // Stopr dragging if pressed shift key
+        if (d3.event.sourceEvent.shiftKey) {
+            // console.log(d3.event);
+            // console.log(d);
+            dragLine.attr('d', 'M' + d.x + ',' + d.y + 'L' + d3.event.x + ',' + d3.event.y);
+        } else {
+            d.x += d3.event.dx;
+            d.y += d3.event.dy;
+
+            d3.select(this).attr("transform", function(d,i){
+                return "translate(" + [ d.x, d.y ] + ")";
+            });
+        }
     }
 
     function zoomed() {
