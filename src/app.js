@@ -50,4 +50,6 @@
         edges: edges
     })
 
+    // Move graph object to global scope.
+    window.graph = graph;
 }(app, d3));
