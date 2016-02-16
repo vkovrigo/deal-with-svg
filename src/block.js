@@ -31,11 +31,11 @@
         this.id = options.id || idGenerator();
 
         this.group = options.container
-            .data([options.coordinates])
+            .data([options.vertex])
             .attr('fill-opacity', 0.2)
             .attr('class', 'block')
             .attr('transform', function(d) {
-                return 'translate(' + [ d.x, d.y ] + ')';
+                return 'translate(' + [ d.coordinates.x, d.coordinates.y ] + ')';
             })
             .call(drag);
 
@@ -49,8 +49,13 @@
     };
 
     Block.prototype.dragmove = function (d) {
-        d.x += d3.event.dx;
-        d.y += d3.event.dy;
+        d.coordinates.x += d3.event.dx;
+        d.coordinates.y += d3.event.dy;
+
+        this.group
+            .attr('transform', function(d) {
+                return 'translate(' + [ d.coordinates.x, d.coordinates.y ] + ')';
+            });
 
         this.dispatch.move();
     };

@@ -40,10 +40,7 @@
 
         this.blocks.enter().append('g').each(function(d, i) {
             var block = new app.Block({
-                id: d.id,
-                x: d.x,
-                y: d.y,
-                coordinates: d.coordinates,
+                vertex: d,
                 container: d3.select(this),
             });
 
