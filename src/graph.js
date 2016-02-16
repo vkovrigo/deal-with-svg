@@ -27,21 +27,45 @@
 
         this.drag = getDrag();
 
-        this.blocks = [
-            new app.Block({
-                container: this.container,
-                x: 20,
-                y: 20,
-                dragBehavior: this.drag
-            }),
-            new app.Block({
-                container: this.container,
-                x: 20,
-                y: 200,
-                dragBehavior: this.drag
-            })
-        ];
+        this.vertices = options.vertices || [];
+        this.edges = options.edges || [];
+
+        this.update();
     };
+
+    Graph.prototype.update = function () {
+        var self = this;
+        this.blocks = this.blocks.data(this.vertices, function (d) {
+            return d.id;
+        });
+
+        this.blocks.enter().append('g').each(function(d, i) {
+            new app.Block({
+                id: d.id,
+                x: d.x,
+                y: d.y,
+                coordinates: d.coordinates,
+                container: d3.select(this),
+                dragBehavior: self.drag
+            });
+        });
+
+        this.blocks.exit().remove();
+
+        this.paths = this.paths.data(this.edges)
+            .attr("d", function (d) {
+                return "M" + d.source.coordinates.x + "," + d.source.coordinates.y + "L" + d.target.coordinates.x + "," + d.target.coordinates.y;
+            });
+
+        this.paths.enter().append("path")
+            .classed("path", true)
+            .attr("d", function (d) {
+                console.log(d)
+                return "M" + d.source.coordinates.x + "," + d.source.coordinates.y + "L" + d.target.coordinates.x + "," + d.target.coordinates.y;
+            });
+
+        this.paths.exit().remove();
+    }
 
 
     function getZoom() {
