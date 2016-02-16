@@ -25,8 +25,6 @@
             .classed("paths", true)
             .selectAll("g");
 
-        this.drag = getDrag();
-
         this.vertices = options.vertices || [];
         this.edges = options.edges || [];
 
@@ -46,7 +44,6 @@
                 y: d.y,
                 coordinates: d.coordinates,
                 container: d3.select(this),
-                dragBehavior: self.drag
             });
         });
 
@@ -79,28 +76,6 @@
 
         return zoom;
     };
-
-    function getDrag() {
-        var drag = d3.behavior.drag()
-            .origin(function(d) { return d })
-            .on('dragstart', dragstart)
-            .on('drag', dragmove);
-
-        function dragstart() {
-            d3.event.sourceEvent.stopPropagation();
-        }
-
-        function dragmove(d) {
-            d.x += d3.event.dx;
-            d.y += d3.event.dy;
-
-            d3.select(this).attr("transform", function(d){
-                return "translate(" + [ d.x, d.y ] + ")";
-            });
-        }
-
-        return drag;
-    }
 
     app.Graph = Graph;
 }(app, d3));
