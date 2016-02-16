@@ -34,5 +34,13 @@
             .attr('width', width);
     };
 
+    var idGenerator = (function () {
+        var id = 100;
+
+        return function () {
+            return id++;
+        }; // Return and increment
+    })()
+
     app.Block = Block;
 }(app, d3));
