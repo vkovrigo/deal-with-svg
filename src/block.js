@@ -13,6 +13,8 @@
      * @param {number} options.coordinates.y - The y position coordinate;
      */
     var Block = function(options) {
+        var self = this;
+
         //Default block width and height;
         var width = 200,
             height = 100;
@@ -20,7 +22,11 @@
         var drag = d3.behavior.drag()
             .origin(function(d) { return d })
             .on('dragstart', this.dragstart)
-            .on('drag', this.dragmove);
+            .on('drag', function() {
+                self.dragmove.apply(self, arguments);
+            })
+
+        this.dispatch = d3.dispatch("move");
 
         this.id = options.id || idGenerator();
 
@@ -46,9 +52,7 @@
         d.x += d3.event.dx;
         d.y += d3.event.dy;
 
-        d3.select(this).attr("transform", function(d){
-            return "translate(" + [ d.x, d.y ] + ")";
-        });
+        this.dispatch.move();
     };
 
     var idGenerator = (function () {

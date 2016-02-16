@@ -33,18 +33,23 @@
 
     Graph.prototype.update = function () {
         var self = this;
+
         this.blocks = this.blocks.data(this.vertices, function (d) {
             return d.id;
         });
 
         this.blocks.enter().append('g').each(function(d, i) {
-            new app.Block({
+            var block = new app.Block({
                 id: d.id,
                 x: d.x,
                 y: d.y,
                 coordinates: d.coordinates,
                 container: d3.select(this),
             });
+
+            block.dispatch.on('move', function() {
+                self.update();
+            })
         });
 
         this.blocks.exit().remove();
