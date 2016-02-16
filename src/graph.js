@@ -15,6 +15,16 @@
             .attr("transform", "translate(-5,-5)")
             .call(this.zoom);
 
+        this.blocks = this.container
+            .append("g")
+            .classed("blocks", true)
+            .selectAll("g");
+
+        this.paths = this.container
+            .append("g")
+            .classed("paths", true)
+            .selectAll("g");
+
         this.drag = getDrag();
 
         this.blocks = [
