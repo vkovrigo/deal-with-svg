@@ -28,6 +28,8 @@
         this.vertices = options.vertices || [];
         this.edges = options.edges || [];
 
+        this.selectedPort = null;
+
         this.update();
     };
 
@@ -46,7 +48,16 @@
 
             block.dispatch.on('move', function() {
                 self.update();
-            })
+            });
+
+            block.dispatch
+                .on('connectionstart', function(d) {
+                    self.connectionstart(d);
+                })
+                .on('connectionend', function(d) {
+                    self.connectionend(d)
+                });
+
         });
 
         this.blocks.exit().remove();
@@ -59,13 +70,32 @@
         this.paths.enter().append("path")
             .classed("path", true)
             .attr("d", function (d) {
-                console.log(d)
                 return "M" + d.source.coordinates.x + "," + d.source.coordinates.y + "L" + d.target.coordinates.x + "," + d.target.coordinates.y;
             });
 
         this.paths.exit().remove();
-    }
+    };
 
+    Graph.prototype.connectionstart = function(d) {
+        this.selectedPort = d;
+    };
+
+    Graph.prototype.connectionend = function(d) {
+        if (this.selectedPort && this.selectedPort.blockId !== d.blockId) {
+            var sourceId = this.selectedPort.blockId,
+                targetId = d.blockId,
+                source = this.vertices.filter(x => x.id === sourceId)[0],
+                target = this.vertices.filter(x => x.id === targetId)[0];
+
+            this.edges.push({
+                source: source,
+                target: target
+            });
+
+            this.update();
+        }
+        this.selectedPort = null;
+    };
 
     function getZoom() {
         var zoom = d3.behavior.zoom()
