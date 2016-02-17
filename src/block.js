@@ -17,7 +17,9 @@
 
         //Default block width and height;
         var width = 200,
-            height = 100;
+            height = 100,
+            portHeight = 10,
+            portWidth = 10;
 
         var drag = d3.behavior.drag()
             .origin(function(d) { return d })
@@ -26,7 +28,7 @@
                 self.dragmove.apply(self, arguments);
             })
 
-        this.dispatch = d3.dispatch("move");
+        this.dispatch = d3.dispatch('move', 'connectionstart', 'connectionend');
 
         this.id = options.id || idGenerator();
 
@@ -42,6 +44,29 @@
         this.rect = this.group.append('rect')
             .attr('height', height)
             .attr('width', width);
+
+        this.portIn = this.group.append('rect')
+            .attr('class', 'port-in')
+            .attr('height', portHeight)
+            .attr('width', portWidth)
+            .attr('x', width/2)
+            .on('mousedown', function(d) {
+                self.dispatch.connectionend({
+                    blockId: d.id,
+                });
+            });
+
+        this.portOut = this.group.append('rect')
+            .attr('class', 'port-out')
+            .attr('height', portHeight)
+            .attr('width', portWidth)
+            .attr('x', width/2)
+            .attr('y', height - portHeight)
+            .on('mousedown', function(d) {
+                self.dispatch.connectionstart({
+                    blockId: d.id,
+                });
+            });
     };
 
     Block.prototype.dragstart = function () {
