@@ -78,6 +78,9 @@
 
     Graph.prototype.connectionstart = function(d) {
         this.selectedPort = d;
+
+        // Highlight all ports for connection.
+        d3.selectAll('.port-in').classed('port-open', true);
     };
 
     Graph.prototype.connectionend = function(d) {
@@ -94,6 +97,10 @@
 
             this.update();
         }
+
+        // Remove highlight all ports for connection.
+        d3.selectAll('.port-in').classed('port-open', false);
+
         this.selectedPort = null;
     };
 
