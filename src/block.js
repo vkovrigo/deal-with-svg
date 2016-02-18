@@ -17,9 +17,7 @@
 
         //Default block width and height;
         var width = 200,
-            height = 100,
-            portHeight = 10,
-            portWidth = 10;
+            height = 100;
 
         var drag = d3.behavior.drag()
             .origin(function(d) { return d })
@@ -45,28 +43,24 @@
             .attr('height', height)
             .attr('width', width);
 
-        this.portIn = this.group.append('rect')
-            .attr('class', 'port-in')
-            .attr('height', portHeight)
-            .attr('width', portWidth)
-            .attr('x', width/2)
-            .on('mousedown', function(d) {
-                self.dispatch.connectionend({
-                    blockId: d.id,
-                });
-            });
 
-        this.portOut = this.group.append('rect')
-            .attr('class', 'port-out')
-            .attr('height', portHeight)
-            .attr('width', portWidth)
-            .attr('x', width/2)
-            .attr('y', height - portHeight)
-            .on('mousedown', function(d) {
-                self.dispatch.connectionstart({
-                    blockId: d.id,
-                });
-            });
+        this.portIn = new Port({
+            type: Port.type.incoming,
+            parent: this
+        }).dispatch.on('portclick', function(d) { self.portclick.apply(self, arguments)});
+
+        this.portOut = new Port({
+            type: Port.type.outgoing,
+            parent: this
+        }).dispatch.on('portclick', function(d) { self.portclick.apply(self, arguments)});
+    };
+
+    Block.prototype.width = function() {
+        return this.group.node().getBBox().width;
+    };
+
+    Block.prototype.height = function() {
+        return this.group.node().getBBox().height;
     };
 
     Block.prototype.dragstart = function () {
@@ -86,6 +80,53 @@
             });
 
         this.dispatch.move();
+    };
+
+    Block.prototype.portclick = function(d) {
+        if (d === Port.type.incoming) {
+            this.dispatch
+                .connectionend({
+                    blockId: this.id
+                });
+        } else {
+            this.dispatch
+                .connectionstart({
+                    blockId: this.id
+                });
+        }
+    }
+
+
+    var Port = function(options) {
+        var self = this;
+
+        this.type = options.type;
+        this.parent = options.parent;
+
+        this.dispatch = d3.dispatch('portclick');
+
+        var portClass = this.type === Port.type.incoming ? 'port-in' : 'port-out',
+            width = this.parent.width(),
+            height = this.parent.height(),
+            portHeight = 10,
+            portWidth = 10,
+            portX = width / 2 - portWidth / 2,
+            portY = this.type === Port.type.incoming ? 0 : height - portHeight;
+
+        this.body = this.parent.group.append('rect')
+            .attr('class', portClass)
+            .attr('height', portHeight)
+            .attr('width', portWidth)
+            .attr('x', portX)
+            .attr('y', portY)
+            .on('mousedown', function(d) {
+                self.dispatch.portclick(self.type);
+            });
+    };
+
+    Port.type = {
+        incoming: 'INCOMING',
+        outgoing: 'OUTGOING'
     };
 
     var idGenerator = (function () {
