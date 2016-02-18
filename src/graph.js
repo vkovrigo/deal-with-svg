@@ -45,7 +45,6 @@
                 vertex: d,
                 container: d3.select(this),
             });
-
             block.dispatch.on('move', function() {
                 self.update();
             });
@@ -57,21 +56,16 @@
                 .on('connectionend', function(d) {
                     self.connectionend(d)
                 });
-
         });
 
         this.blocks.exit().remove();
 
-        this.paths = this.paths.data(this.edges)
-            .attr("d", function (d) {
-                return "M" + d.source.coordinates.x + "," + d.source.coordinates.y + "L" + d.target.coordinates.x + "," + d.target.coordinates.y;
-            });
+        this.paths = this.paths.data(this.edges, function(d) { return d.source + '+' + d.target; })
+            .attr("d", this.connectItems);
 
         this.paths.enter().append("path")
             .classed("path", true)
-            .attr("d", function (d) {
-                return "M" + d.source.coordinates.x + "," + d.source.coordinates.y + "L" + d.target.coordinates.x + "," + d.target.coordinates.y;
-            });
+            .attr("d", this.connectItems);
 
         this.paths.exit().remove();
     };
@@ -84,15 +78,13 @@
     };
 
     Graph.prototype.connectionend = function(d) {
-        if (this.selectedPort && this.selectedPort.blockId !== d.blockId) {
-            var sourceId = this.selectedPort.blockId,
-                targetId = d.blockId,
-                source = this.vertices.filter(x => x.id === sourceId)[0],
-                target = this.vertices.filter(x => x.id === targetId)[0];
+        if (this.selectedPort && this.selectedPort !== d) {
+            var sourceId = this.selectedPort,
+                targetId = d;
 
             this.edges.push({
-                source: source,
-                target: target
+                source: sourceId,
+                target: targetId
             });
 
             this.update();
@@ -102,6 +94,15 @@
         d3.selectAll('.port-in').classed('port-open', false);
 
         this.selectedPort = null;
+    };
+
+    Graph.prototype.connectItems = function(relations) {
+        var source = d3.select('#block-' + relations.source).datum(),
+            target = d3.select('#block-' + relations.target).datum(),
+            sourcePosition = source.outgoingPopsition(),
+            targetPosition = target.incomingPopsition();
+
+        return "M" + sourcePosition.x + "," + sourcePosition.y + "L" + targetPosition.x + "," + targetPosition.y;
     };
 
     function getZoom() {

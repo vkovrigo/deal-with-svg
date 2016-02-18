@@ -28,14 +28,16 @@
 
         this.dispatch = d3.dispatch('move', 'connectionstart', 'connectionend');
 
-        this.id = options.id || idGenerator();
+        this.id = options.vertex.id || idGenerator();
 
         this.group = options.container
-            .data([options.vertex])
+            .append('g').attr('class', 'block-wrapper') // ?? Extra wrapper for separating data from vertices list and bind this to current block
+            .datum(this)
             .attr('fill-opacity', 0.2)
             .attr('class', 'block')
+            .attr('id', 'block-' + this.id)
             .attr('transform', function(d) {
-                return 'translate(' + [ d.coordinates.x - width/2, d.coordinates.y - height/2 ] + ')';
+                return 'translate(' + [ options.vertex.coordinates.x - width/2, options.vertex.coordinates.y - height/2 ] + ')';
             })
             .call(drag);
 
@@ -47,12 +49,14 @@
         this.portIn = new Port({
             type: Port.type.incoming,
             parent: this
-        }).dispatch.on('portclick', function(d) { self.portclick.apply(self, arguments)});
+        });
+        this.portIn.dispatch.on('portclick', this.portclick.bind(this));
 
         this.portOut = new Port({
             type: Port.type.outgoing,
             parent: this
-        }).dispatch.on('portclick', function(d) { self.portclick.apply(self, arguments)});
+        });
+        this.portOut.dispatch.on('portclick', this.portclick.bind(this));
     };
 
     Block.prototype.width = function() {
@@ -72,26 +76,20 @@
     };
 
     Block.prototype.incomingPopsition = function() {
-        var x = +this.portIn.body.attr('x'),
-            y = +this.portIn.body.attr('x'),
-            portW = +this.portIn.body.attr('width'),
-            portH = +this.portIn.body.attr('height');
+        var portRect = this.portIn.body.node().getBBox();
 
         return {
-            x: x + this.x() + portW/2,
-            y: this.y() + portH/2
+            x: portRect.x + this.x() + portRect.width/2,
+            y: this.y() + portRect.height/2
         };
     };
 
     Block.prototype.outgoingPopsition = function() {
-        var x = +this.portOut.body.attr('x'),
-            y = +this.portOut.body.attr('x'),
-            portW = +this.portOut.body.attr('width'),
-            portH = +this.portOut.body.attr('height');
+        var portRect = this.portOut.body.node().getBBox();
 
         return {
-            x: x + this.x() + portW/2,
-            y: y + this.y()
+            x: portRect.x + this.x() + portRect.width/2,
+            y: portRect.y + this.y() + portRect.height/2
         };
     };
 
@@ -115,15 +113,9 @@
 
     Block.prototype.portclick = function(d) {
         if (d === Port.type.incoming) {
-            this.dispatch
-                .connectionend({
-                    blockId: this.id
-                });
+            this.dispatch.connectionend(this.id);
         } else {
-            this.dispatch
-                .connectionstart({
-                    blockId: this.id
-                });
+            this.dispatch.connectionstart(this.id);
         }
     }
 

@@ -30,12 +30,12 @@
         ],
         edges = [
             {
-                source: vertices[0],
-                target: vertices[1]
+                source: vertices[0].id,
+                target: vertices[1].id
             },
             {
-                source: vertices[0],
-                target: vertices[2]
+                source: vertices[0].id,
+                target: vertices[2].id
             }
         ];
 
