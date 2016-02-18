@@ -63,20 +63,51 @@
         return this.group.node().getBBox().height;
     };
 
+    Block.prototype.x = function() {
+        return d3.transform(this.group.attr('transform')).translate[0];
+    };
+
+    Block.prototype.y = function() {
+        return d3.transform(this.group.attr('transform')).translate[1];
+    };
+
+    Block.prototype.incomingPopsition = function() {
+        var x = +this.portIn.body.attr('x'),
+            y = +this.portIn.body.attr('x'),
+            portW = +this.portIn.body.attr('width'),
+            portH = +this.portIn.body.attr('height');
+
+        return {
+            x: x + this.x() + portW/2,
+            y: this.y() + portH/2
+        };
+    };
+
+    Block.prototype.outgoingPopsition = function() {
+        var x = +this.portOut.body.attr('x'),
+            y = +this.portOut.body.attr('x'),
+            portW = +this.portOut.body.attr('width'),
+            portH = +this.portOut.body.attr('height');
+
+        return {
+            x: x + this.x() + portW/2,
+            y: y + this.y()
+        };
+    };
+
     Block.prototype.dragstart = function () {
         d3.event.sourceEvent.stopPropagation();
     };
 
     Block.prototype.dragmove = function (d) {
-        var width = this.rect.attr('width'),
-            height = this.rect.attr('height');
-
-        d.coordinates.x += d3.event.dx;
-        d.coordinates.y += d3.event.dy;
+        var width = this.width(),
+            height = this.height(),
+            x = this.x() + d3.event.dx,
+            y = this.y() + d3.event.dy;
 
         this.group
             .attr('transform', function(d) {
-                return 'translate(' + [ d.coordinates.x - width/2, d.coordinates.y - height/2 ] + ')';
+                return 'translate(' + [ x, y ] + ')';
             });
 
         this.dispatch.move();
