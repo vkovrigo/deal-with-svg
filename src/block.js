@@ -37,7 +37,7 @@
             .attr('fill-opacity', 0.2)
             .attr('class', 'block')
             .attr('transform', function(d) {
-                return 'translate(' + [ d.coordinates.x, d.coordinates.y ] + ')';
+                return 'translate(' + [ d.coordinates.x - width/2, d.coordinates.y - height/2 ] + ')';
             })
             .call(drag);
 
@@ -74,12 +74,15 @@
     };
 
     Block.prototype.dragmove = function (d) {
+        var width = this.rect.attr('width'),
+            height = this.rect.attr('height');
+
         d.coordinates.x += d3.event.dx;
         d.coordinates.y += d3.event.dy;
 
         this.group
             .attr('transform', function(d) {
-                return 'translate(' + [ d.coordinates.x, d.coordinates.y ] + ')';
+                return 'translate(' + [ d.coordinates.x - width/2, d.coordinates.y - height/2 ] + ')';
             });
 
         this.dispatch.move();

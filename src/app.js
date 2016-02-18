@@ -9,22 +9,22 @@
             {
                 id: 0,
                 coordinates: {
-                    x: 20,
-                    y: 20,
+                    x: 120,
+                    y: 70,
                 }
             },
             {
                 id: 1,
                 coordinates: {
-                    x: 20,
+                    x: 120,
                     y: 200,
                 }
             },
             {
                 id: 2,
                 coordinates: {
-                    x: 300,
-                    y: 200,
+                    x: 350,
+                    y: 350,
                 }
             }
         ],
