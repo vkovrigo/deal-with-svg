@@ -7,21 +7,21 @@
     // Initial data
     var vertices = [
             {
-                id: 0,
+                id: 1,
                 coordinates: {
                     x: 120,
                     y: 70,
                 }
             },
             {
-                id: 1,
+                id: 2,
                 coordinates: {
                     x: 120,
                     y: 200,
                 }
             },
             {
-                id: 2,
+                id: 3,
                 coordinates: {
                     x: 350,
                     y: 350,
