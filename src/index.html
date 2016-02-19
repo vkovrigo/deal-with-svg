@@ -29,9 +29,29 @@
                 fill: green;
                 fill-opacity: 1;
             }
+            .popup {
+                position: absolute;
+                background-color: #fff;
+                /*width: 200px;*/
+                border: 1px #ccc solid;
+                border-radius: 6px;
+                box-shadow: #333 2px 2px 4px;
+                padding: 8px;
+            }
+            .hidden {
+                display: none;
+            }
         </style>
     </head>
     <body>
+        <div class="popup hidden">
+            <ul>
+                <li data-type="say">Say</li>
+                <li data-type="handler">Handler</li>
+                <li data-type="converter">Converter</li>
+                <li data-type="input">Input</li>
+            </ul>
+        </div>
         <script type="text/javascript">
             var app = {};
         </script>

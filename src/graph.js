@@ -59,7 +59,7 @@
         this.paths.enter().append("path")
             .classed("path", true)
             .attr("d", this.connectItems)
-            .on('mousedown', this.insertNewItem.bind(this));
+            .on('mousedown', this.selectBlockType.bind(this));
 
         this.paths.exit().remove();
     };
@@ -99,16 +99,15 @@
         return "M" + sourcePosition.x + "," + sourcePosition.y + "L" + targetPosition.x + "," + targetPosition.y;
     };
 
-    Graph.prototype.insertNewItem = function(edge) {
+    Graph.prototype.insertNewItem = function(edge, type, position) {
         var source = d3.select('#block-' + edge.source).datum(),
             target = d3.select('#block-' + edge.target).datum(),
-            xy = d3.mouse(this.container.node()),
             vertix = {
                 id: idGenerator(),
-                type: app.Block.type.say,
+                type: type,
                 coordinates: {
-                    x: xy[0],
-                    y: xy[1]
+                    x: position[0],
+                    y: position[1]
                 }
             },
             currentEdgeIndex = graph.edges.indexOf(edge);
@@ -129,6 +128,27 @@
 
                 this.update();
             }
+    };
+
+    Graph.prototype.selectBlockType = function(d) {
+        var self = this,
+            xy = d3.mouse(d3.select('svg').node()),
+            popup = d3.select('.popup');
+
+        popup.classed('hidden', false)
+            .style("left", xy[0] + "px")
+            .style("top", xy[1] + "px")
+            .on('click', function(event) {
+                var type = d3.select(d3.event.target)
+                    .datum(function() { return this.dataset; })
+                    .datum().type;
+
+                d3.select(this).classed('hidden', true);
+
+                if (type) self.insertNewItem(d, app.Block.type[type], xy);
+            });
+
+        d3.event.preventDefault();
     };
 
     function getZoom() {
