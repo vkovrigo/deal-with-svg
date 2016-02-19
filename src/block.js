@@ -30,11 +30,21 @@
 
         this.id = options.vertex.id || idGenerator();
 
+        this.type = options.vertex.type;
+
+        if (this.type === Block.type.inputValue || this.type === Block.type.inputError) {
+            width = width / 2;
+            height = height / 2;
+        } else if (this.type === Block.type.input) {
+            height = height / 2;
+        }
+
         this.group = options.container
             .append('g').attr('class', 'block-wrapper') // ?? Extra wrapper for separating data from vertices list and bind this to current block
             .datum(this)
             .attr('fill-opacity', 0.2)
             .attr('class', 'block')
+            .classed(this.type.toLowerCase(), true)
             .attr('id', 'block-' + this.id)
             .attr('transform', function(d) {
                 return 'translate(' + [ options.vertex.coordinates.x - width/2, options.vertex.coordinates.y - height/2 ] + ')';
@@ -46,17 +56,9 @@
             .attr('width', width);
 
 
-        this.portIn = new Port({
-            type: Port.type.incoming,
-            parent: this
-        });
-        this.portIn.dispatch.on('portclick', this.portclick.bind(this));
-
-        this.portOut = new Port({
-            type: Port.type.outgoing,
-            parent: this
-        });
-        this.portOut.dispatch.on('portclick', this.portclick.bind(this));
+        this.portIn = null;
+        this.portOut = null;
+        this.insertPorts();
     };
 
     Block.prototype.width = function() {
@@ -93,6 +95,7 @@
         };
     };
 
+    // Events
     Block.prototype.dragstart = function () {
         d3.event.sourceEvent.stopPropagation();
     };
@@ -117,7 +120,50 @@
         } else {
             this.dispatch.connectionstart(this.id);
         }
+    };
+
+    // Internal methods
+    Block.prototype.insertPorts = function() {
+        switch (this.type) {
+            case Block.type.start:
+                this.portOut = new Port({
+                    type: Port.type.outgoing,
+                    parent: this
+                });
+                break;
+            case Block.type.finish:
+                this.portIn = new Port({
+                    type: Port.type.incoming,
+                    parent: this
+                });
+                break;
+            default:
+                this.portOut = new Port({
+                    type: Port.type.outgoing,
+                    parent: this
+                });
+                this.portIn = new Port({
+                    type: Port.type.incoming,
+                    parent: this
+                });
+                break;
+        }
+
+        if (this.portIn) this.portIn.dispatch.on('portclick', this.portclick.bind(this));
+        if (this.portOut) this.portOut.dispatch.on('portclick', this.portclick.bind(this));
+
     }
+
+    Block.type = {
+        start: 'START',
+        say: 'SAY',
+        handler: 'HANDLER',
+        converter: 'CONVERTER',
+        input: 'INPUT',
+        inputValue: 'INPUTVALUE',
+        inputError: 'INPUTERROR',
+        finish: 'FINISH'
+    };
 
 
     var Port = function(options) {

@@ -105,6 +105,7 @@
             xy = d3.mouse(this.container.node()),
             vertix = {
                 id: idGenerator(),
+                type: app.Block.type.say,
                 coordinates: {
                     x: xy[0],
                     y: xy[1]
