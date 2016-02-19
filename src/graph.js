@@ -65,7 +65,8 @@
 
         this.paths.enter().append("path")
             .classed("path", true)
-            .attr("d", this.connectItems);
+            .attr("d", this.connectItems)
+            .on('mousedown', this.insertNewItem.bind(this));
 
         this.paths.exit().remove();
     };
@@ -103,6 +104,37 @@
             targetPosition = target.incomingPopsition();
 
         return "M" + sourcePosition.x + "," + sourcePosition.y + "L" + targetPosition.x + "," + targetPosition.y;
+    };
+
+    Graph.prototype.insertNewItem = function(edge) {
+        var source = d3.select('#block-' + edge.source).datum(),
+            target = d3.select('#block-' + edge.target).datum(),
+            xy = d3.mouse(this.container.node()),
+            vertix = {
+                id: idGenerator(),
+                coordinates: {
+                    x: xy[0],
+                    y: xy[1]
+                }
+            },
+            currentEdgeIndex = graph.edges.indexOf(edge);
+
+            if (currentEdgeIndex !== -1) {
+                this.edges.splice(currentEdgeIndex, 1); // Remove old edge.
+
+                this.vertices.push(vertix);
+
+                // Insert 2 edges for connect new inserted vertex
+                this.edges.push({
+                    source: edge.source,
+                    target: vertix.id
+                },{
+                    source: vertix.id,
+                    target: edge.target
+                });
+
+                this.update();
+            }
     };
 
     function getZoom() {
