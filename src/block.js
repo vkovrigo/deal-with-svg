@@ -158,7 +158,8 @@
         return function () {
             return id++;
         }; // Return and increment
-    })()
+    })();
 
     app.Block = Block;
+    window.idGenerator = idGenerator;
 }(app, d3));
