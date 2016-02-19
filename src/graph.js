@@ -45,17 +45,10 @@
                 vertex: d,
                 container: d3.select(this),
             });
-            block.dispatch.on('move', function() {
-                self.update();
-            });
-
             block.dispatch
-                .on('connectionstart', function(d) {
-                    self.connectionstart(d);
-                })
-                .on('connectionend', function(d) {
-                    self.connectionend(d)
-                });
+                .on('move', self.update.bind(self))
+                .on('connectionstart', self.connectionstart.bind(self))
+                .on('connectionend', self.connectionend.bind(self));
         });
 
         this.blocks.exit().remove();
