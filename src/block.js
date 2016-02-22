@@ -19,6 +19,10 @@
         var width = 200,
             height = 100;
 
+        // Port sizes.
+        this.portHeight = 10;
+        this.portWidth = 10;
+
         var drag = d3.behavior.drag()
             .origin(function(d) { return d })
             .on('dragstart', this.dragstart)
@@ -55,9 +59,8 @@
             .attr('height', height)
             .attr('width', width);
 
-
         this.portIn = null;
-        this.portOut = null;
+        this.portsOut = [];
         this.insertPorts();
     };
 
@@ -86,8 +89,8 @@
         };
     };
 
-    Block.prototype.outgoingPopsition = function() {
-        var portRect = this.portOut.body.node().getBBox();
+    Block.prototype.outgoingPopsition = function(portId) {
+        var portRect = this.portsOut[portId].body.node().getBBox();
 
         return {
             x: portRect.x + this.x() + portRect.width/2,
@@ -115,10 +118,10 @@
     };
 
     Block.prototype.portclick = function(d) {
-        if (d === Port.type.incoming) {
-            this.dispatch.connectionend(this.id);
+        if (d.type === Port.type.incoming) {
+            this.dispatch.connectionend({ blockId: this.id, portId: d.id });
         } else {
-            this.dispatch.connectionstart(this.id);
+            this.dispatch.connectionstart({ blockId: this.id, portId: d.id });
         }
     };
 
@@ -126,10 +129,10 @@
     Block.prototype.insertPorts = function() {
         switch (this.type) {
             case Block.type.start:
-                this.portOut = new Port({
+                this.portsOut.push(new Port({
                     type: Port.type.outgoing,
                     parent: this
-                });
+                }));
                 break;
             case Block.type.finish:
                 this.portIn = new Port({
@@ -137,11 +140,27 @@
                     parent: this
                 });
                 break;
-            default:
-                this.portOut = new Port({
-                    type: Port.type.outgoing,
+            case Block.type.input:
+                var count = 2; // Default port count for input type.
+
+                this.portIn = new Port({
+                    type: Port.type.incoming,
                     parent: this
                 });
+                for (var i = 0; i <= count - 1; i++) {
+                    this.portsOut.push(new Port({
+                        id: i,
+                        type: Port.type.outgoing,
+                        parent: this
+                    }));
+                }
+                break;
+            default:
+                this.portsOut.push(new Port({
+                    id: 0,
+                    type: Port.type.outgoing,
+                    parent: this
+                }));
                 this.portIn = new Port({
                     type: Port.type.incoming,
                     parent: this
@@ -149,9 +168,43 @@
                 break;
         }
 
-        if (this.portIn) this.portIn.dispatch.on('portclick', this.portclick.bind(this));
-        if (this.portOut) this.portOut.dispatch.on('portclick', this.portclick.bind(this));
+        if (this.portIn) {
+            var port = this.portIn,
+                position = this.calculatePortPosition(port.type, 0, 1);
 
+            port.body
+                .attr('height', this.portHeight)
+                .attr('width', this.portWidth)
+                .attr('x', position.x)
+                .attr('y', position.y);
+
+            port.dispatch.on('portclick', this.portclick.bind(this));
+        }
+
+        if (this.portsOut.length) {
+            this.portsOut.forEach((port, i, ports) => {
+                var position = this.calculatePortPosition(port.type, i, ports.length);
+
+                port.body
+                    .attr('height', this.portHeight)
+                    .attr('width', this.portWidth)
+                    .attr('x', position.x)
+                    .attr('y', position.y);
+
+                port.dispatch.on('portclick', this.portclick.bind(this));
+            });
+        }
+
+    };
+
+    Block.prototype.calculatePortPosition = function(portType, portIndex, portCount) {
+        var width = this.width(),
+            height = this.height(),
+            inputWidth = width / portCount,
+            x = inputWidth * (portIndex + 1) - inputWidth / 2 - this.portWidth / 2,
+            y = portType === Port.type.incoming ? 0 : height - this.portHeight;
+
+        return { x, y }
     }
 
     Block.type = {
@@ -160,8 +213,6 @@
         handler: 'HANDLER',
         converter: 'CONVERTER',
         input: 'INPUT',
-        inputValue: 'INPUTVALUE',
-        inputError: 'INPUTERROR',
         finish: 'FINISH'
     };
 
@@ -169,27 +220,18 @@
     var Port = function(options) {
         var self = this;
 
+        this.id = options.id || 0;
         this.type = options.type;
         this.parent = options.parent;
 
         this.dispatch = d3.dispatch('portclick');
 
-        var portClass = this.type === Port.type.incoming ? 'port-in' : 'port-out',
-            width = this.parent.width(),
-            height = this.parent.height(),
-            portHeight = 10,
-            portWidth = 10,
-            portX = width / 2 - portWidth / 2,
-            portY = this.type === Port.type.incoming ? 0 : height - portHeight;
+        var portClass = this.type === Port.type.incoming ? 'port-in' : 'port-out';
 
         this.body = this.parent.group.append('rect')
             .attr('class', portClass)
-            .attr('height', portHeight)
-            .attr('width', portWidth)
-            .attr('x', portX)
-            .attr('y', portY)
             .on('mousedown', function(d) {
-                self.dispatch.portclick(self.type);
+                self.dispatch.portclick({ id: self.id, type: self.type });
             });
     };
 

@@ -53,7 +53,10 @@
 
         this.blocks.exit().remove();
 
-        this.paths = this.paths.data(this.edges, function(d) { return d.source + '+' + d.target; })
+        this.paths = this.paths
+            .data(this.edges, function(d) {
+                return d.source.blockId + '+' + d.target.blockId + '+' + d.source.portId + '+' + d.target.portId;
+            })
             .attr("d", this.connectItems);
 
         this.paths.enter().append("path")
@@ -73,12 +76,18 @@
 
     Graph.prototype.connectionend = function(d) {
         if (this.selectedPort && this.selectedPort !== d) {
-            var sourceId = this.selectedPort,
-                targetId = d;
+            var source = this.selectedPort,
+                target = d;
 
             this.edges.push({
-                source: sourceId,
-                target: targetId
+                source: {
+                    blockId: source.blockId,
+                    portId: source.portId
+                },
+                target: {
+                    blockId: target.blockId,
+                    portId: target.portId
+                }
             });
 
             this.update();
@@ -90,18 +99,18 @@
         this.selectedPort = null;
     };
 
-    Graph.prototype.connectItems = function(relations) {
-        var source = d3.select('#block-' + relations.source).datum(),
-            target = d3.select('#block-' + relations.target).datum(),
-            sourcePosition = source.outgoingPopsition(),
+    Graph.prototype.connectItems = function(edge) {
+        var source = d3.select('#block-' + edge.source.blockId).datum(),
+            target = d3.select('#block-' + edge.target.blockId).datum(),
+            sourcePosition = source.outgoingPopsition(edge.source.portId),
             targetPosition = target.incomingPopsition();
 
         return "M" + sourcePosition.x + "," + sourcePosition.y + "L" + targetPosition.x + "," + targetPosition.y;
     };
 
     Graph.prototype.insertNewItem = function(edge, type, position) {
-        var source = d3.select('#block-' + edge.source).datum(),
-            target = d3.select('#block-' + edge.target).datum(),
+        var source = d3.select('#block-' + edge.source.blockId).datum(),
+            target = d3.select('#block-' + edge.target.blockId).datum(),
             vertix = {
                 id: idGenerator(),
                 type: type,
@@ -119,11 +128,11 @@
 
                 // Insert 2 edges for connect new inserted vertex
                 this.edges.push({
-                    source: edge.source,
-                    target: vertix.id
+                    source: { blockId: edge.source.blockId, portId: edge.source.portId },
+                    target: { blockId: vertix.id, portId: 0 }
                 },{
-                    source: vertix.id,
-                    target: edge.target
+                    source: { blockId: vertix.id, portId: 0 },
+                    target: { blockId: edge.target.blockId, portId: edge.target.portId }
                 });
 
                 this.update();
