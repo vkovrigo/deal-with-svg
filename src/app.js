@@ -1,8 +1,8 @@
 (function(app, d3) {
     'use strict';
 
-    var canvasWidth = 600,
-        canvasHeight = 600;
+    var canvasWidth = 1024,
+        canvasHeight = 768;
 
     // Initial data
     var vertices = [
