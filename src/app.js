@@ -32,22 +32,6 @@
             },
             {
                 id: 4,
-                type: app.Block.type.inputValue,
-                coordinates: {
-                    x: 250,
-                    y: 375,
-                }
-            },
-            {
-                id: 5,
-                type: app.Block.type.inputError,
-                coordinates: {
-                    x: 350,
-                    y: 375,
-                }
-            },
-            {
-                id: 6,
                 type: app.Block.type.finish,
                 coordinates: {
                     x: 300,
@@ -57,28 +41,20 @@
         ],
         edges = [
             {
-                source: vertices[0].id,
-                target: vertices[1].id
+                source: { blockId: vertices[0].id, portId: 0 },
+                target: { blockId: vertices[1].id, portId: 0 }
             },
             {
-                source: vertices[1].id,
-                target: vertices[2].id
+                source: { blockId: vertices[1].id, portId: 0 },
+                target: { blockId: vertices[2].id, portId: 0 }
             },
             {
-                source: vertices[2].id,
-                target: vertices[3].id
+                source: { blockId: vertices[2].id, portId: 0 },
+                target: { blockId: vertices[3].id, portId: 0 }
             },
             {
-                source: vertices[2].id,
-                target: vertices[4].id
-            },
-            {
-                source: vertices[3].id,
-                target: vertices[5].id
-            },
-            {
-                source: vertices[4].id,
-                target: vertices[5].id
+                source: { blockId: vertices[2].id, portId: 1 },
+                target: { blockId: vertices[1].id, portId: 0 }
             },
         ];
 
