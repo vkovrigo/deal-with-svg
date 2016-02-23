@@ -36,13 +36,6 @@
 
         this.type = options.vertex.type;
 
-        if (this.type === Block.type.inputValue || this.type === Block.type.inputError) {
-            width = width / 2;
-            height = height / 2;
-        } else if (this.type === Block.type.input) {
-            height = height / 2;
-        }
-
         this.group = options.container
             .append('g').attr('class', 'block-wrapper') // ?? Extra wrapper for separating data from vertices list and bind this to current block
             .datum(this)
