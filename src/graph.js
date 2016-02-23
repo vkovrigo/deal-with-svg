@@ -103,9 +103,72 @@
         var source = d3.select('#block-' + edge.source.blockId).datum(),
             target = d3.select('#block-' + edge.target.blockId).datum(),
             sourcePosition = source.outgoingPopsition(edge.source.portId),
-            targetPosition = target.incomingPopsition();
+            targetPosition = target.incomingPopsition(),
+            sourceX = sourcePosition.x,
+            sourceY = sourcePosition.y,
+            targetX = targetPosition.x,
+            targetY = targetPosition.y,
+            sourceW = source.width(),
+            targetW = target.width(),
+            indent = 50,
+            points = [],
+            line = d3.svg.line().interpolate('basis');
 
-        return "M" + sourcePosition.x + "," + sourcePosition.y + "L" + targetPosition.x + "," + targetPosition.y;
+        if (sourceY - targetY > indent * 2) { // Top
+            /**
+             *                  p4
+             *         p5' +-----+-----+ p5
+             *   Left      |     |     |    Right
+             *         p6' +     |     + p6
+             *                   |
+             *          p1 +     |
+             *             |     |
+             *          p2 +-----+ p3
+             *
+             * p1 - source port point;
+             * p6/p6' - target port point;
+             * p2.y - p1.y === p6.y - p5.y === indent;
+             */
+            var p3x, p3y, p4y;
+
+            points.push([sourceX, sourceY]) // p1
+            points.push([sourceX, sourceY + indent]); // p2
+            if (sourceX - targetX < 0) { // Right
+                p3x = sourceX + (((targetX - sourceX) > (sourceW + targetW)/2) ? (targetX - sourceX)/2 : targetX - sourceX + targetW);
+            } else { // Left
+                p3x = targetX + (((sourceX - targetX) > (sourceW + targetW)/2) ? (sourceX - targetX)/2 : sourceX - targetX - targetW/2);
+            }
+            p3y = sourceY + indent;
+            points.push([p3x, p3y]); // p3
+            p4y = targetY - indent;
+            points.push([p3x, p4y]); // p4
+            points.push([targetX, p4y]); // p5
+            points.push([targetX, targetY]); // p6
+        } else { // Bottom
+            /**
+             *                   + p1
+             *                   |
+             *                   | p2
+             *    p3 +-----------+
+             *       |
+             *       |
+             *    p4 +
+             *
+             * p1 - source port point;
+             * p4 - target port point;
+             * p2.y - p1.y === p4.y - p3.y;
+             */
+            var p2y;
+
+            points.push([sourceX, sourceY]); // p1
+            p2y = (targetY - sourceY) / 2 + sourceY;
+            points.push([sourceX, p2y]); // p2
+            points.push([targetX, p2y]); // p3
+            points.push([targetX, targetY]); // p4
+
+        }
+
+        return line(points);
     };
 
     Graph.prototype.insertNewItem = function(edge, type, position) {
