@@ -56,13 +56,14 @@
         this.portsOut = [];
 
         if (this.type === Block.type.input) { // Insert default inputs: all and error
-            var payload = options.vertex.payload.sort(p => p.error ? 1 : -1), // Put error input to last position;
-                width = this.width() / payload.length,
+            this.payload = options.vertex.payload.sort(p => p.error ? 1 : -1); // Put error input to last position;
+
+            var width = this.width() / this.payload.length,
                 height = this.height() / 2,
                 y = height,
                 x = 0;
 
-            payload.forEach(value => {
+            this.payload.forEach(value => {
                 this.group.append('rect')
                     .datum(value)
                     .classed('error-value', value.error)
@@ -71,7 +72,6 @@
                     .attr('x', x)
                     .attr('y', y)
                     .on('click', (d) => {
-                        console.log('input click', d, this, arguments, d3.event);
                         if (!d.error) { // Skip error input editing
                             this.dispatch.edit(this, d.id);
                         }
@@ -115,7 +115,7 @@
     };
 
     Block.prototype.outgoingPopsition = function(portId) {
-        var portRect = this.portsOut[portId].body.node().getBBox();
+        var portRect = this.portsOut.filter(p => p.id === portId)[0].body.node().getBBox();
 
         return {
             x: portRect.x + this.x() + portRect.width/2,
@@ -172,13 +172,13 @@
                     type: Port.type.incoming,
                     parent: this
                 });
-                for (var i = 0; i <= count - 1; i++) {
+                this.payload.forEach(value => {
                     this.portsOut.push(new Port({
-                        id: i,
+                        id: value.id,
                         type: Port.type.outgoing,
                         parent: this
                     }));
-                }
+                });
                 break;
             default:
                 this.portsOut.push(new Port({
