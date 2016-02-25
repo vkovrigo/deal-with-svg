@@ -28,7 +28,19 @@
                 coordinates: {
                     x: 300,
                     y: 300,
-                }
+                },
+                payload: [
+                    {
+                        id: 1,
+                        text: '?',
+                        error: true
+                    },
+                    {
+                        id: 0,
+                        text: 'All user input',
+                        error: false
+                    }
+                ]
             },
             {
                 id: 4,

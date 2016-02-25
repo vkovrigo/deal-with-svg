@@ -30,7 +30,7 @@
                 self.dragmove.apply(self, arguments);
             })
 
-        this.dispatch = d3.dispatch('move', 'connectionstart', 'connectionend');
+        this.dispatch = d3.dispatch('move', 'connectionstart', 'connectionend', 'edit');
 
         this.id = options.vertex.id || idGenerator();
 
@@ -54,6 +54,38 @@
 
         this.portIn = null;
         this.portsOut = [];
+
+        if (this.type === Block.type.input) { // Insert default inputs: all and error
+            var payload = options.vertex.payload.sort(p => p.error ? 1 : -1), // Put error input to last position;
+                width = this.width() / payload.length,
+                height = this.height() / 2,
+                y = height,
+                x = 0;
+
+            payload.forEach(value => {
+                this.group.append('rect')
+                    .datum(value)
+                    .classed('error-value', value.error)
+                    .attr('width', width)
+                    .attr('height', height)
+                    .attr('x', x)
+                    .attr('y', y)
+                    .on('click', (d) => {
+                        console.log('input click', d, this, arguments, d3.event);
+                        if (!d.error) { // Skip error input editing
+                            this.dispatch.edit(this, d.id);
+                        }
+                    });
+
+                this.group.append('text')
+                    .text(value.text)
+                    .attr('x', x + 5)
+                    .attr('y', y + 20);
+
+                x += width; // move next value on previues width;
+            });
+        }
+
         this.insertPorts();
     };
 
