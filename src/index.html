@@ -41,6 +41,18 @@
             .hidden {
                 display: none;
             }
+            .overlay {
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                right: 0;
+                background-color: green;
+                opacity: 0.1;
+            }
+            .form-edit {
+                position: absolute;
+            }
         </style>
     </head>
     <body>
@@ -52,6 +64,9 @@
                 <li data-type="input">Input</li>
             </ul>
         </div>
+        <div class="form-edit hidden">
+            <input type="text" placeholder="Please entet smth" autofocus></input>
+        </div>
         <script type="text/javascript">
             var app = {};
         </script>
@@ -59,5 +74,6 @@
         <script type="text/javascript" src="block.js"></script>
         <script type="text/javascript" src="graph.js"></script>
         <script type="text/javascript" src="app.js"></script>
+        <script type="text/javascript" src="editor.js"></script>
     </body>
 </html>
