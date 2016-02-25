@@ -50,7 +50,8 @@
             block.dispatch
                 .on('move', self.update.bind(self))
                 .on('connectionstart', self.connectionstart.bind(self))
-                .on('connectionend', self.connectionend.bind(self));
+                .on('connectionend', self.connectionend.bind(self))
+                .on('edit', (...arg) => self.showEditForm(...arg));
         });
 
         this.blocks.exit().remove();
@@ -224,6 +225,40 @@
 
         d3.event.preventDefault();
     };
+
+    Graph.prototype.showEditForm = function(block, inputId) {
+        var xy = d3.mouse(d3.select('svg').node())
+
+        var editor = new app.Editor();
+
+        editor.dispatch.on('close', (save) => {
+            if (save) {
+                var data = editor.getData(),
+                    // TODO: The magic w/ update exist vertex!!!
+                    vertex = this.vertices.filter(v => v.id === block.id)[0],
+                    copyVertex = JSON.parse(JSON.stringify(vertex)), // deep copy
+                    input = copyVertex.payload.filter(value => value.id === inputId)[0];
+
+                if (input) {
+                    input.text = data;
+                } else {
+                    copyVertex.payload.push({
+                        id: idGenerator(),
+                        text: data,
+                        error: false
+                    });
+                }
+
+                this.vertices.splice(this.vertices.indexOf(vertex), 1);
+                this.vertices.push(copyVertex);
+
+                this.update();
+            }
+
+            editor.close();
+        });
+        editor.show(xy);
+    }
 
     function getZoom() {
         var zoom = d3.behavior.zoom()
