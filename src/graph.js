@@ -37,7 +37,9 @@
         var self = this;
 
         this.blocks = this.blocks.data(this.vertices, function (d) {
-            return d.id;
+            var hash = (d.payload) ? JSON.stringify(d.payload) : '';
+
+            return d.id + hash;
         });
 
         this.blocks.enter().append('g').each(function(d, i) {
