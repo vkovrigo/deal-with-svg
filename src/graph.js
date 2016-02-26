@@ -189,6 +189,21 @@
             },
             currentEdgeIndex = graph.edges.indexOf(edge);
 
+            if (type === app.Block.type.input) {
+                vertix.payload = [
+                    {
+                        id: 1,
+                        text: '?',
+                        error: true
+                    },
+                    {
+                        id: 0,
+                        text: 'All user input',
+                        error: false
+                    }
+                ];
+            }
+
             if (currentEdgeIndex !== -1) {
                 this.edges.splice(currentEdgeIndex, 1); // Remove old edge.
 
