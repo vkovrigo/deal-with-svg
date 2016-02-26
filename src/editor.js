@@ -29,6 +29,7 @@
 
         this.overlay.classList.remove('hidden');
         this.form.classList.remove('hidden');
+        this.form.focus();
 
         this.overlay.addEventListener('click', this._loseFocusHandler);
         this.form.addEventListener('keydown', this._keyDownHandler);
