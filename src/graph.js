@@ -51,7 +51,9 @@
                 .on('move', self.update.bind(self))
                 .on('connectionstart', self.connectionstart.bind(self))
                 .on('connectionend', self.connectionend.bind(self))
-                .on('edit', (...arg) => self.showEditForm(...arg));
+                .on('edit', (...arg) => self.showEditForm(...arg))
+                .on('removeValue', (...arg) => self.removeInput(...arg))
+                .on('addValue', (block) => self.showEditForm(block));
         });
 
         this.blocks.exit().remove();
@@ -239,9 +241,9 @@
                     copyVertex = JSON.parse(JSON.stringify(vertex)), // deep copy
                     input = copyVertex.payload.filter(value => value.id === inputId)[0];
 
-                if (input) {
+                if (input) { // Edit exist input
                     input.text = data;
-                } else {
+                } else { // Add new input
                     copyVertex.payload.push({
                         id: idGenerator(),
                         text: data,
@@ -258,6 +260,22 @@
             editor.close();
         });
         editor.show(xy);
+    };
+
+    Graph.prototype.removeInput = function(block, inputId) {
+        var vertex = this.vertices.filter(v => v.id === block.id)[0],
+            copyVertex = JSON.parse(JSON.stringify(vertex)), // deep copy
+            input = copyVertex.payload.filter(value => value.id === inputId)[0],
+            inputIndex = copyVertex.payload.indexOf(input);
+
+        copyVertex.payload.splice(inputIndex, 1); // Remove selected input
+        this.vertices.splice(this.vertices.indexOf(vertex), 1);
+        this.vertices.push(copyVertex);
+
+        var edgesToRemove = this.edges.filter(e => e.source.blockId === block.id && e.source.portId === inputId);
+        this.edges = this.edges.filter(e => !edgesToRemove.some(er => er === e));
+
+        this.update();
     }
 
     function getZoom() {

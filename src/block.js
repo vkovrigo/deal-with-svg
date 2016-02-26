@@ -30,7 +30,13 @@
                 self.dragmove.apply(self, arguments);
             })
 
-        this.dispatch = d3.dispatch('move', 'connectionstart', 'connectionend', 'edit');
+        this.dispatch = d3.dispatch(
+            'move',
+            'connectionstart',
+            'connectionend',
+            'edit',
+            'addValue', 'removeValue' //This events should be specific for each type of blocks
+        );
 
         this.id = options.vertex.id || idGenerator();
 
@@ -65,22 +71,41 @@
 
             this.payload.forEach(value => {
                 this.group.append('rect')
-                    .datum(value)
                     .classed('error-value', value.error)
                     .attr('width', width)
                     .attr('height', height)
                     .attr('x', x)
-                    .attr('y', y)
-                    .on('click', (d) => {
-                        if (!d.error) { // Skip error input editing
-                            this.dispatch.edit(this, d.id);
-                        }
-                    });
+                    .attr('y', y);
 
                 this.group.append('text')
+                    .datum(value)
                     .text(value.text)
                     .attr('x', x + 5)
                     .attr('y', y + 20);
+
+                if (!value.error) { // Add edit/remove button only for not error values
+                    // Edit and remove button
+                    this.group.append('foreignObject')
+                        .datum(value)
+                        .attr('x', x + 15)
+                        .attr('y', y + 25)
+                        .append('xhtml:div')
+                            .html('<i class="fa fa-pencil-square"></i>')
+                            .on('click', (d) => {
+                                this.dispatch.edit(this, d.id);
+                            });
+
+                    this.group.append('foreignObject')
+                        .datum(value)
+                        .attr('x', x + 45)
+                        .attr('y', y + 25)
+                        .append('xhtml:div')
+                            .html('<i class="fa fa-times"></i>')
+                            .on('click', (d) => {
+                                this.dispatch.removeValue(this, d.id);
+                            });
+                    //***********
+                }
 
                 x += width; // move next value on previues width;
             });
@@ -92,7 +117,7 @@
                 .append('xhtml:div')
                 .html('<i class="fa fa-plus-circle fa-lg"></i>')
                 .on('click', () => {
-                    this.dispatch.edit(this, idGenerator());
+                    this.dispatch.addValue(this);
                 });
             //***********
         }
