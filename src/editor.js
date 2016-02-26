@@ -1,7 +1,7 @@
 (function(app, undefined) {
     'use strict';
 
-    function Editor() {
+    function Editor(position, payload) {
 
         this.form = document.getElementsByClassName('form-edit')[0];
 
@@ -13,19 +13,30 @@
         }
 
         // d3 event bus;
-        this.dispatch = d3.dispatch('close');
+        this.dispatch = d3.dispatch('save');
 
-        this._loseFocusHandler = event => this.onLoseFocus(event);
-        this._keyDownHandler = event => this.onKeyDown(event);
+        this._position = position;
+        this._payload = payload || { id: idGenerator(), text: '', error: false };
+
+        this._loseFocusHandler = event => this._onLoseFocus(event);
+        this._keyDownHandler = event => this._onKeyDown(event);
+
+        this._setPayload(this._payload);
     };
 
-    Editor.prototype.getData = function() {
-        return this.form.querySelector('input').value;
+    Editor.prototype._getPayload = function() {
+        this._payload.text = this.form.querySelector('input').value;
+
+        return this._payload;
     };
 
-    Editor.prototype.show = function(position) {
-        this.form.style.left = position[0] + 'px';
-        this.form.style.top = position[1] + 'px';
+    Editor.prototype._setPayload = function(payload) {
+        this.form.querySelector('input').value = payload.text;
+    };
+
+    Editor.prototype.show = function() {
+        this.form.style.left = this._position[0] + 'px';
+        this.form.style.top = this._position[1] + 'px';
 
         this.overlay.classList.remove('hidden');
         this.form.classList.remove('hidden');
@@ -33,10 +44,9 @@
 
         this.overlay.addEventListener('click', this._loseFocusHandler);
         this.form.addEventListener('keydown', this._keyDownHandler);
-
     };
 
-    Editor.prototype.close = function() {
+    Editor.prototype._close = function() {
         this.overlay.classList.add('hidden');
         this.form.classList.add('hidden');
 
@@ -44,16 +54,17 @@
         this.form.removeEventListener('keydown', this._keyDownHandler);
     };
 
-    Editor.prototype.onKeyDown = function(event) {
+    Editor.prototype._onKeyDown = function(event) {
         if (event.keyCode === 27) { // Escape pressed
-            this.dispatch.close(false);
+            this._close();
         } else if (event.keyCode === 13) { // Enter pressed
-            this.dispatch.close(true);
+            this.dispatch.save(this._getPayload());
+            this._close();
         }
     };
 
-    Editor.prototype.onLoseFocus = function(event) {
-        this.dispatch.close(false);
+    Editor.prototype._onLoseFocus = function(event) {
+        this._close();
     };
 
     app.Editor = Editor;

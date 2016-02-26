@@ -244,45 +244,31 @@
     };
 
     Graph.prototype.showEditForm = function(block, inputId) {
-        var xy = d3.mouse(d3.select('svg').node())
+        var xy = d3.mouse(d3.select('svg').node()),
+            vertex = this.vertices.filter(v => v.id === block.id)[0],
+            copyVertex = JSON.parse(JSON.stringify(vertex)), // deep copy
+            payload = copyVertex.payload.filter(value => value.id === inputId)[0],
+            editor = new app.Editor(xy, payload);
 
-        var editor = new app.Editor();
-
-        editor.dispatch.on('close', (save) => {
-            if (save) {
-                var data = editor.getData(),
-                    // TODO: The magic w/ update exist vertex!!!
-                    vertex = this.vertices.filter(v => v.id === block.id)[0],
-                    copyVertex = JSON.parse(JSON.stringify(vertex)), // deep copy
-                    input = copyVertex.payload.filter(value => value.id === inputId)[0];
-
-                if (input) { // Edit exist input
-                    input.text = data;
-                } else { // Add new input
-                    var newInput = {
-                        id: idGenerator(),
-                        text: data,
-                        error: false
-                    },
-                    finish = this.vertices.filter(v => v.type === app.Block.type.finish)[0],
-                    newEdge = {
-                        source: { blockId: block.id, portId: newInput.id },
+        editor.dispatch.on('save', (payload) => {
+            if (inputId === undefined) { // New value
+                var finish = this.vertices.filter(v => v.type === app.Block.type.finish)[0],
+                    edge = {
+                        source: { blockId: block.id, portId: payload.id },
                         target: { blockId: finish.id, portId: 0 }
                     };
 
-                    copyVertex.payload.push(newInput);
-                    this.edges.push(newEdge); // Add new edge for new input closed to finish block.
-                }
-
-                this.vertices.splice(this.vertices.indexOf(vertex), 1);
-                this.vertices.push(copyVertex);
-
-                this.update();
+                copyVertex.payload.push(payload);
+                this.edges.push(edge); // Add new edge for new input closed to finish block.
             }
 
-            editor.close();
+            this.vertices.splice(this.vertices.indexOf(vertex), 1);
+            this.vertices.push(copyVertex);
+
+            this.update();
         });
-        editor.show(xy);
+
+        editor.show();
     };
 
     Graph.prototype.removeInput = function(block, inputId) {
