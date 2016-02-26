@@ -244,11 +244,19 @@
                 if (input) { // Edit exist input
                     input.text = data;
                 } else { // Add new input
-                    copyVertex.payload.push({
+                    var newInput = {
                         id: idGenerator(),
                         text: data,
                         error: false
-                    });
+                    },
+                    finish = this.vertices.filter(v => v.type === app.Block.type.finish)[0],
+                    newEdge = {
+                        source: { blockId: block.id, portId: newInput.id },
+                        target: { blockId: finish.id, portId: 0 }
+                    };
+
+                    copyVertex.payload.push(newInput);
+                    this.edges.push(newEdge); // Add new edge for new input closed to finish block.
                 }
 
                 this.vertices.splice(this.vertices.indexOf(vertex), 1);
