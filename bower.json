@@ -16,6 +16,7 @@
     "tests"
   ],
   "dependencies": {
-    "d3": "^3.5.14"
+    "d3": "^3.5.14",
+    "font-awesome": "fontawesome#^4.5.0"
   }
 }
