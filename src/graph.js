@@ -179,7 +179,7 @@
     Graph.prototype.insertNewItem = function(edge, type, position) {
         var source = d3.select('#block-' + edge.source.blockId).datum(),
             target = d3.select('#block-' + edge.target.blockId).datum(),
-            vertix = {
+            vertex = {
                 id: idGenerator(),
                 type: type,
                 coordinates: {
@@ -190,7 +190,7 @@
             currentEdgeIndex = graph.edges.indexOf(edge);
 
             if (type === app.Block.type.input) {
-                vertix.payload = [
+                vertex.payload = [
                     {
                         id: 1,
                         text: '?',
@@ -207,14 +207,14 @@
             if (currentEdgeIndex !== -1) {
                 this.edges.splice(currentEdgeIndex, 1); // Remove old edge.
 
-                this.vertices.push(vertix);
+                this.vertices.push(vertex);
 
                 // Insert 2 edges for connect new inserted vertex
                 this.edges.push({
                     source: { blockId: edge.source.blockId, portId: edge.source.portId },
-                    target: { blockId: vertix.id, portId: 0 }
+                    target: { blockId: vertex.id, portId: 0 }
                 },{
-                    source: { blockId: vertix.id, portId: 0 },
+                    source: { blockId: vertex.id, portId: 0 },
                     target: { blockId: edge.target.blockId, portId: edge.target.portId }
                 });
 
