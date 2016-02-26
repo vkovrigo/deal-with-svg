@@ -84,6 +84,17 @@
 
                 x += width; // move next value on previues width;
             });
+
+            // Add new value button
+            var button = this.group.append('foreignObject')
+                .attr('x', this.width()/2 - 9)
+                .attr('y', 20)
+                .append('xhtml:div')
+                .html('<i class="fa fa-plus-circle fa-lg"></i>')
+                .on('click', () => {
+                    this.dispatch.edit(this, idGenerator());
+                });
+            //***********
         }
 
         this.insertPorts();
