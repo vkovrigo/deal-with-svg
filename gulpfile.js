@@ -1,7 +1,9 @@
 'use strict';
 
 var gulp = require('gulp'),
-    connect = require('gulp-connect');
+    connect = require('gulp-connect'),
+    sourcemaps = require("gulp-sourcemaps"),
+    babel = require("gulp-babel");
 
 gulp.task('connect', function() {
     connect.server({
@@ -10,7 +12,7 @@ gulp.task('connect', function() {
     });
 });
 
-gulp.task('js', function () {
+gulp.task('js', ['es6'], function () {
     gulp.src('./src/*.js')
         .pipe(connect.reload());
 });
@@ -20,3 +22,11 @@ gulp.task('watch', function () {
 });
 
 gulp.task('default', ['connect', 'watch']);
+
+gulp.task('es6', function () {
+  return gulp.src('src/**/*.js')
+    .pipe(sourcemaps.init())
+    .pipe(babel())
+    .pipe(sourcemaps.write('.'))
+    .pipe(gulp.dest('dist'));
+});
