@@ -248,7 +248,7 @@
             vertex = this.vertices.filter(v => v.id === block.id)[0],
             copyVertex = JSON.parse(JSON.stringify(vertex)), // deep copy
             payload = copyVertex.payload.filter(value => value.id === inputId)[0],
-            editor = new app.Editor(xy, payload);
+            editor = app.editorFactory(block.type, xy, payload);
 
         editor.dispatch.on('save', (payload) => {
             if (inputId === undefined) { // New value

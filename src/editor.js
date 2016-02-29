@@ -56,7 +56,7 @@
         }
     }
 
-    class Editor extends AbstractEditor {
+    class InputEditor extends AbstractEditor {
         constructor(position, payload) {
             super(position);
 
@@ -124,6 +124,16 @@
         }
     }
 
-    app.Editor = Editor;
-    app.ConverterEditor = ConverterEditor;
+    function editorFactory(blockType, position, payload) {
+        switch (blockType) {
+            case app.Block.type.input:
+                return new InputEditor(position, payload);
+            case app.Block.type.converter:
+                return new ConverterEditor(position, payload);
+            default:
+                throw `Editor is undefined for current block type: ${blockType}`;
+        }
+    }
+
+    app.editorFactory = editorFactory;
 }(app));
