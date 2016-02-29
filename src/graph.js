@@ -202,6 +202,14 @@
                         error: false
                     }
                 ];
+            } else if (type === app.Block.type.converter) {
+                vertex.payload = [
+                    {
+                        id: idGenerator(),
+                        from: 'value',
+                        to: 'value'
+                    }
+                ]
             }
 
             if (currentEdgeIndex !== -1) {
@@ -252,14 +260,16 @@
 
         editor.dispatch.on('save', (payload) => {
             if (inputId === undefined) { // New value
-                var finish = this.vertices.filter(v => v.type === app.Block.type.finish)[0],
-                    edge = {
-                        source: { blockId: block.id, portId: payload.id },
-                        target: { blockId: finish.id, portId: 0 }
-                    };
-
                 copyVertex.payload.push(payload);
-                this.edges.push(edge); // Add new edge for new input closed to finish block.
+
+                if (block.type === app.Block.type.input) { // Add new edge for new input closed to finish block.
+                    var finish = this.vertices.filter(v => v.type === app.Block.type.finish)[0],
+                        edge = {
+                            source: { blockId: block.id, portId: payload.id },
+                            target: { blockId: finish.id, portId: 0 }
+                        };
+                    this.edges.push(edge);
+                }
             }
 
             this.vertices.splice(this.vertices.indexOf(vertex), 1);

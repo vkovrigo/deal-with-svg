@@ -111,9 +111,55 @@
             });
 
             this.rect.attr('width', x)
+        } else if (this.type === Block.type.converter) {
+            this.payload = options.vertex.payload;
 
-            // Add new value button
-            var button = this.group.append('foreignObject')
+            var width = this.width(),
+                height = this.height() / 2,
+                y = height,
+                x = 0;
+
+            this.payload.forEach(value => {
+                this.group.append('rect')
+                    .attr('width', width)
+                    .attr('height', height)
+                    .attr('x', x)
+                    .attr('y', y);
+
+                this.group.append('text')
+                    .datum(value)
+                    .text(`${value.from} -> ${value.to}`)
+                    .attr('x', x + 5)
+                    .attr('y', y + 20);
+
+                this.group.append('foreignObject')
+                    .datum(value)
+                    .attr('x', x + 15)
+                    .attr('y', y + 25)
+                    .append('xhtml:div')
+                        .html('<i class="fa fa-pencil-square"></i>')
+                        .on('click', (d) => {
+                            this.dispatch.edit(this, d.id);
+                        });
+
+                this.group.append('foreignObject')
+                    .datum(value)
+                    .attr('x', x + 45)
+                    .attr('y', y + 25)
+                    .append('xhtml:div')
+                        .html('<i class="fa fa-times"></i>')
+                        .on('click', (d) => {
+                            this.dispatch.removeValue(this, d.id);
+                        });
+
+                y += height; // move next value on previues width;
+            });
+
+            this.rect.attr('height', y);
+        }
+
+        if (this.type === Block.type.input || this.type === Block.type.converter) { // Create add button
+            this.group.append('foreignObject')
                 .attr('x', this.width()/2 - 9)
                 .attr('y', 20)
                 .append('xhtml:div')
@@ -121,7 +167,6 @@
                 .on('click', () => {
                     this.dispatch.addValue(this);
                 });
-            //***********
         }
 
         this.insertPorts();
