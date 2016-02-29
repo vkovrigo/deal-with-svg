@@ -64,7 +64,7 @@
         if (this.type === Block.type.input) { // Insert default inputs: all and error
             this.payload = options.vertex.payload.sort(p => p.error ? 1 : -1); // Put error input to last position;
 
-            var width = this.width() / this.payload.length,
+            var width = this.width() / 2,
                 height = this.height() / 2,
                 y = height,
                 x = 0;
@@ -109,6 +109,8 @@
 
                 x += width; // move next value on previues width;
             });
+
+            this.rect.attr('width', x)
 
             // Add new value button
             var button = this.group.append('foreignObject')
