@@ -124,12 +124,45 @@
         }
     }
 
+    class SayEditor extends AbstractEditor {
+        constructor(position, payload) {
+            super(position);
+
+            this.form = document.getElementsByClassName('form-edit-say')[0];
+
+            this._payload = payload || { id: idGenerator(), text: '' };
+
+            this._setPayload(this._payload);
+        }
+
+        _getPayload() {
+            this._payload.message = this.form.querySelector('textarea').value;
+
+            return this._payload;
+        }
+
+        _setPayload(payload) {
+            this.form.querySelector('textarea').value = payload.message;
+        }
+
+        _onKeyDown(event) {
+            super._onKeyDown(event);
+
+            if (event.keyCode === key.enter && !event.shiftKey) { // If shift key pressed just new line
+                this.dispatch.save(this._getPayload());
+                this._close();
+            }
+        }
+    }
+
     function editorFactory(blockType, position, payload) {
         switch (blockType) {
             case app.Block.type.input:
                 return new InputEditor(position, payload);
             case app.Block.type.converter:
                 return new ConverterEditor(position, payload);
+            case app.Block.type.say:
+                return new SayEditor(position, payload);
             default:
                 throw `Editor is undefined for current block type: ${blockType}`;
         }
