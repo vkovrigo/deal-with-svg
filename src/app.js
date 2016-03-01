@@ -20,7 +20,13 @@
                 coordinates: {
                     x: 300,
                     y: 180,
-                }
+                },
+                payload: [
+                    {
+                        id: 0,
+                        message: 'Hello bro! Say hello me!'
+                    }
+                ]
             },
             {
                 id: 3,
@@ -66,7 +72,7 @@
             },
             {
                 source: { blockId: vertices[2].id, portId: 1 },
-                target: { blockId: vertices[1].id, portId: 0 }
+                target: { blockId: vertices[3].id, portId: 0 }
             },
         ];
 

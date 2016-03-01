@@ -210,6 +210,8 @@
                         to: 'value'
                     }
                 ]
+            } else if (type === app.Block.type.say) {
+                vertex.payload = [{ id: idGenerator(), message: 'Click to edit...' }]
             }
 
             if (currentEdgeIndex !== -1) {

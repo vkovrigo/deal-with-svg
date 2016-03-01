@@ -156,6 +156,24 @@
             });
 
             this.rect.attr('height', y);
+        } else if (this.type === Block.type.say) {
+            this.payload = options.vertex.payload[0];
+
+            var fo = this.group.append('foreignObject')
+                .datum(this.payload)
+                .append('xhtml:div')
+                .classed('wrapper', true)
+                .style('padding-left', '10px')
+                .style('padding-top', '10px');
+            fo.append('xhtml:div')
+                .style('width', this.width() - 20 + 'px')
+                .style('max-height', this.height() - 40 + 'px')
+                .text(this.payload.message);
+            fo.append('xhtml:div')
+                .html('<i class="fa fa-pencil-square"></i>')
+                .on('click', (d) => {
+                    this.dispatch.edit(this, d.id);
+                });
         }
 
         if (this.type === Block.type.input || this.type === Block.type.converter) { // Create add button
