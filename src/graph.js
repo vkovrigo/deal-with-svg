@@ -10,10 +10,10 @@
     var Graph = function(options) {
         this.zoom = getZoom();
 
-        this.container = options.svg.append('g')
+        this.container = options.svg
+            .call(this.zoom).append('g')
             .attr('class', 'graph-container')
-            .attr("transform", "translate(-5,-5)")
-            .call(this.zoom);
+            .attr("transform", "translate(-5,-5)");
 
         this.blocks = this.container
             .append("g")
@@ -305,7 +305,7 @@
             .on('zoom', zoomed);
 
         function zoomed() {
-            d3.select(this).attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+            d3.select('.graph-container').attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
         }
 
         return zoom;
