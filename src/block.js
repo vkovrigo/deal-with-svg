@@ -64,51 +64,31 @@
         if (this.type === Block.type.input) { // Insert default inputs: all and error
             this.payload = options.vertex.payload.sort(p => p.error ? 1 : -1); // Put error input to last position;
 
-            var width = this.width() / 2,
+            var width = this.payload.length > 1 ? this.width() / 2 : this.width(),
                 height = this.height() / 2,
                 y = height,
                 x = 0;
 
             this.payload.forEach(value => {
-                this.group.append('rect')
-                    .classed('error-value', value.error)
-                    .attr('width', width)
-                    .attr('height', height)
-                    .attr('x', x)
-                    .attr('y', y);
+                var edit, remove;
 
-                this.group.append('text')
-                    .datum(value)
-                    .text(value.text)
-                    .attr('x', x + 5)
-                    .attr('y', y + 20);
-
-                if (!value.error) { // Add edit/remove button only for not error values
-                    // Edit and remove button
-                    this.group.append('foreignObject')
-                        .datum(value)
-                        .attr('x', x + 15)
-                        .attr('y', y + 25)
-                        .append('xhtml:div')
-                            .html('<i class="fa fa-pencil-square"></i>')
-                            .on('click', (d) => {
-                                this.dispatch.edit(this, d.id);
-                            });
-
-                    this.group.append('foreignObject')
-                        .datum(value)
-                        .attr('x', x + 45)
-                        .attr('y', y + 25)
-                        .append('xhtml:div')
-                            .html('<i class="fa fa-times"></i>')
-                            .on('click', (d) => {
-                                this.dispatch.removeValue(this, d.id);
-                            });
-                    //***********
+                if (!value.error) {
+                    edit = (d) => this.dispatch.edit(this, d.id);
+                    remove = (d) => this.dispatch.removeValue(this, d.id);
                 }
 
+                var textBlock = onelineTextBlock({
+                    parent: this.group,
+                    data: value,
+                    text: value.text,
+                    edit: edit,
+                    remove: remove
+                });
+
+                textBlock.attr('width', width).attr('x', x).attr('y', y);
+
                 x += width; // move next value on previues width;
-            });
+            }, this);
 
             this.rect.attr('width', x)
         } else if (this.type === Block.type.converter) {
@@ -120,37 +100,15 @@
                 x = 0;
 
             this.payload.forEach(value => {
-                this.group.append('rect')
-                    .attr('width', width)
-                    .attr('height', height)
-                    .attr('x', x)
-                    .attr('y', y);
+                var textBlock = onelineTextBlock({
+                    parent: this.group,
+                    data: value,
+                    text: `${value.from} -> ${value.to}`,
+                    edit: (d) => this.dispatch.edit(this, d.id),
+                    remove: (d) => this.dispatch.removeValue(this, d.id)
+                });
 
-                this.group.append('text')
-                    .datum(value)
-                    .text(`${value.from} -> ${value.to}`)
-                    .attr('x', x + 5)
-                    .attr('y', y + 20);
-
-                this.group.append('foreignObject')
-                    .datum(value)
-                    .attr('x', x + 15)
-                    .attr('y', y + 25)
-                    .append('xhtml:div')
-                        .html('<i class="fa fa-pencil-square"></i>')
-                        .on('click', (d) => {
-                            this.dispatch.edit(this, d.id);
-                        });
-
-                this.group.append('foreignObject')
-                    .datum(value)
-                    .attr('x', x + 45)
-                    .attr('y', y + 25)
-                    .append('xhtml:div')
-                        .html('<i class="fa fa-times"></i>')
-                        .on('click', (d) => {
-                            this.dispatch.removeValue(this, d.id);
-                        });
+                textBlock.attr('width', width).attr('x', x).attr('y', y);
 
                 y += height; // move next value on previues width;
             });
@@ -373,6 +331,35 @@
             return id++;
         }; // Return and increment
     })();
+
+    function onelineTextBlock(options) {
+        var fo = options.parent.append('foreignObject')
+            .datum(options.data);
+
+        var wrapper = fo.append('xhtml:div')
+            .classed('wrapper', true)
+            .style('width', '100%')
+            .style('padding-left', '10px')
+            .style('padding-top', '10px')
+
+        wrapper.append('xhtml:div')
+            .classed('truncate', true)
+            .style('width', '80%')
+            .text(options.text);
+
+        if (options.edit) {
+            wrapper.append('xhtml:div')
+                .html('<i class="fa fa-pencil-square"></i>')
+                .on('click', options.edit);
+        }
+        if (options.remove) {
+            wrapper.append('xhtml:div')
+                .html('<i class="fa fa-times"></i>')
+                .on('click', options.remove);
+        }
+
+        return fo;
+    }
 
     app.Block = Block;
     window.idGenerator = idGenerator;
