@@ -84,6 +84,9 @@
             var source = this.selectedPort,
                 target = d;
 
+            var edgesToRemove = this.edges.filter(e => e.source.blockId === source.blockId && e.source.portId === source.portId);
+            this.edges = this.edges.filter(e => !edgesToRemove.some(er => er === e));
+
             this.edges.push({
                 source: {
                     blockId: source.blockId,
