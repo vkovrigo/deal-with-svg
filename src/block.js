@@ -17,7 +17,11 @@
 
         //Default block width and height;
         var width = 200,
-            height = 100;
+            height = 100,
+            inputValueWidth = 142,
+            inputErroeWidth = width - inputValueWidth,
+            converterValueHeight = 51,
+            converterHeaderHeight = height - converterValueHeight;
 
         // Port sizes.
         this.portHeight = 10;
@@ -54,6 +58,17 @@
             })
             .call(drag);
 
+        this.payload =  this.type !== Block.type.input ? options.vertex.payload : options.vertex.payload.sort(p => p.error);
+
+        // Recalculate size for some block types
+        if (this.type === Block.type.input) {
+            width = this.payload.length > 1 ? inputValueWidth * (this.payload.length - 1) : inputValueWidth;
+            width += inputErroeWidth;
+        } else if (this.type === Block.type.converter) {
+            height = this.payload.length > 0 ? converterValueHeight * this.payload.length : converterValueHeight;
+            height += converterHeaderHeight;
+        }
+
         this.rect = this.group.append('rect')
             .attr('height', height)
             .attr('width', width);
@@ -61,7 +76,6 @@
         this.portIn = null;
         this.portsOut = [];
 
-        this.payload =  this.type !== Block.type.input ? options.vertex.payload : options.vertex.payload.sort(p => p.error);
 
         let html, w, h, y;
         if (this.type === Block.type.input) {
@@ -75,8 +89,8 @@
             let template = document.getElementById('converters-template').textContent;
 
             w = this.width();
-            h = this.payload.length > 0 ? this.height() / 2 : 0;
-            y = this.payload.length > 0 ? h : this.height();
+            h = this.payload.length > 0 ? converterValueHeight * this.payload.length : 0;
+            y = this.payload.length > 0 ? converterHeaderHeight : this.height();
             html = Mustache.render(template, { values: this.payload });
         } else if (this.type === Block.type.say) {
             let template = document.getElementById('say-template').textContent;
