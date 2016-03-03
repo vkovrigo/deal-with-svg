@@ -16,10 +16,10 @@
         var self = this;
 
         //Default block width and height;
+        this.inputValueWidth = 100;
         var width = 200,
             height = 100,
-            inputValueWidth = 142,
-            inputErroeWidth = width - inputValueWidth,
+            inputErroeWidth = 40,
             converterValueHeight = 51,
             converterHeaderHeight = height - converterValueHeight;
 
@@ -62,7 +62,7 @@
 
         // Recalculate size for some block types
         if (this.type === Block.type.input) {
-            width = this.payload.length > 1 ? inputValueWidth * (this.payload.length - 1) : inputValueWidth;
+            width = this.payload.length > 1 ? this.inputValueWidth * (this.payload.length - 1) : this.inputValueWidth;
             width += inputErroeWidth;
         } else if (this.type === Block.type.converter) {
             height = this.payload.length > 0 ? converterValueHeight * this.payload.length : converterValueHeight;
@@ -82,8 +82,8 @@
             let template = document.getElementById('inputs-template').textContent;
 
             w = this.width() - 2;
-            h = this.height() / 3;
-            y = h;
+            h = 48;
+            y = 53;
             html = Mustache.render(template, { values: this.payload.filter(v => !v.error) });
         } else if (this.type === Block.type.converter) {
             let template = document.getElementById('converters-template').textContent;
@@ -281,6 +281,15 @@
             inputWidth = width / portCount,
             x = inputWidth * (portIndex + 1) - inputWidth / 2 - this.portWidth / 2,
             y = portType === Port.type.incoming ? 0 : height - this.portHeight;
+
+        // Some magic for center out ports in input block
+        if (this.type === Block.type.input) {
+            if (portType === Port.type.outgoing && portCount > 1 && portIndex === portCount - 1) {
+                x = this.inputValueWidth * (portCount - 1) + 12;
+            } else if (portType === Port.type.outgoing) {
+                x = this.inputValueWidth * (portIndex + 1) - this.inputValueWidth / 2 - this.portWidth / 2;
+            }
+        }
 
         return { x, y }
     }
