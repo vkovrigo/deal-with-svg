@@ -1,0 +1,98 @@
+.wrapper {
+    border: 1px solid;
+    display: flex;
+    width:  100%;
+}
+
+.wrapper-input {
+    flex-direction: row;
+    border-bottom: none;
+}
+
+.wrapper-converter {
+    flex-direction: column;
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+}
+
+.wrapper-say {
+    height: 100%;
+}
+
+.value {
+    flex: 1;
+    padding: 10px;
+}
+
+.value-input {
+    border-right: 1px solid;
+    text-align: center;
+}
+
+.value-converter {
+    border-bottom: 1px solid;
+}
+
+.value-converter .from, .value-converter .to {
+    display: inline-block;
+    width: 45%;
+    text-align: center;
+}
+.arrow {
+    display: inline-block;
+    width: 5%;
+    text-align: center;
+}
+
+.controls {
+    visibility: hidden;
+    cursor: pointer;
+    margin-top: -30px;
+}
+
+.control {
+    display: inline-block;
+    margin: 5px;
+    padding: 5px;
+    background-color: rgba(255,255,255,0.5);
+}
+
+.value:hover > .controls {
+    visibility: visible;
+}
+
+.error-input {
+    width: 40px;
+    margin: auto;
+    text-align: center;
+}
+
+.btn-add {
+    visibility: hidden;
+    color: white;
+    background-color: red;
+
+    /* create circle */
+    width: 32px;
+    height: 32px;
+    border-radius: 100%;
+
+    /* center text in circule */
+    line-height: 32px;
+    text-align: center;
+}
+
+.wrapper:hover .btn-add {
+    visibility: visible;
+}
+
+.btn-add-input {
+    margin-left: -16px;
+    margin-top: 10px;
+}
+
+.btn-add-converter {
+    margin-left: 10%;
+    margin-top: -16px;
+}
