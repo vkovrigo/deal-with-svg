@@ -61,88 +61,40 @@
         this.portIn = null;
         this.portsOut = [];
 
-        if (this.type === Block.type.input) { // Insert default inputs: all and error
-            this.payload = options.vertex.payload.sort(p => p.error ? 1 : -1); // Put error input to last position;
+        this.payload =  this.type !== Block.type.input ? options.vertex.payload : options.vertex.payload.sort(p => p.error);
 
-            var width = this.payload.length > 1 ? this.width() / 2 : this.width(),
-                height = this.height() / 2,
-                y = height,
-                x = 0;
+        let html, w, h, y;
+        if (this.type === Block.type.input) {
+            let template = document.getElementById('inputs-template').textContent;
 
-            this.payload.forEach(value => {
-                var edit, remove;
-
-                if (!value.error) {
-                    edit = (d) => this.dispatch.edit(this, d.id);
-                    remove = (d) => this.dispatch.removeValue(this, d.id);
-                }
-
-                var textBlock = onelineTextBlock({
-                    parent: this.group,
-                    data: value,
-                    text: value.text,
-                    edit: edit,
-                    remove: remove
-                });
-
-                textBlock.attr('width', width).attr('x', x).attr('y', y);
-
-                x += width; // move next value on previues width;
-            }, this);
-
-            this.rect.attr('width', x)
+            w = this.width() - 2;
+            h = this.height() / 3;
+            y = h;
+            html = Mustache.render(template, { values: this.payload.filter(v => !v.error) });
         } else if (this.type === Block.type.converter) {
-            this.payload = options.vertex.payload;
+            let template = document.getElementById('converters-template').textContent;
 
-            var width = this.width(),
-                height = this.height() / 2,
-                y = height,
-                x = 0;
-
-            this.payload.forEach(value => {
-                var textBlock = onelineTextBlock({
-                    parent: this.group,
-                    data: value,
-                    text: `${value.from} -> ${value.to}`,
-                    edit: (d) => this.dispatch.edit(this, d.id),
-                    remove: (d) => this.dispatch.removeValue(this, d.id)
-                });
-
-                textBlock.attr('width', width).attr('x', x).attr('y', y);
-
-                y += height; // move next value on previues width;
-            });
-
-            this.rect.attr('height', y);
+            w = this.width();
+            h = this.payload.length > 0 ? this.height() / 2 : 0;
+            y = this.payload.length > 0 ? h : this.height();
+            html = Mustache.render(template, { values: this.payload });
         } else if (this.type === Block.type.say) {
-            this.payload = options.vertex.payload[0];
+            let template = document.getElementById('say-template').textContent;
 
-            var fo = this.group.append('foreignObject')
-                .datum(this.payload)
-                .append('xhtml:div')
-                .classed('wrapper', true)
-                .style('padding-left', '10px')
-                .style('padding-top', '10px');
-            fo.append('xhtml:div')
-                .style('width', this.width() - 20 + 'px')
-                .style('max-height', this.height() - 40 + 'px')
-                .text(this.payload.message);
-            fo.append('xhtml:div')
-                .html('<i class="fa fa-pencil-square"></i>')
-                .on('click', (d) => {
-                    this.dispatch.edit(this, d.id);
-                });
+            w = this.width() - 2;
+            y = 30;
+            h = this.height() - y;
+            html = Mustache.render(template, { values: this.payload, maxHeight: h - y });
         }
 
-        if (this.type === Block.type.input || this.type === Block.type.converter) { // Create add button
+        if (html) {
             this.group.append('foreignObject')
-                .attr('x', this.width()/2 - 9)
-                .attr('y', 20)
-                .append('xhtml:div')
-                .html('<i class="fa fa-plus-circle fa-lg"></i>')
-                .on('click', () => {
-                    this.dispatch.addValue(this);
-                });
+                .datum(this.payload)
+                .attr('width', w)
+                .attr('height', h)
+                .attr('y', y)
+                .html(html)
+                .on('mousedown', d => this.editing(d));
         }
 
         this.insertPorts();
@@ -208,6 +160,28 @@
             this.dispatch.connectionstart({ blockId: this.id, portId: d.id });
         }
     };
+
+    Block.prototype.editing = function(d) {
+        var action = findDatasetValue(d3.event.target, 'action'),
+            valueId;
+        if (action) {
+            switch (action) {
+                case 'add':
+                    this.dispatch.addValue(this);
+                    break;
+                case 'remove':
+                    valueId = parseInt(findDatasetValue(d3.event.target, 'valueId'));
+                    this.dispatch.removeValue(this, valueId);
+                    break;
+                case 'edit':
+                    valueId = parseInt(findDatasetValue(d3.event.target, 'valueId'));
+                    this.dispatch.edit(this, valueId);
+                    break;
+            }
+
+            d3.event.stopPropagation(); // Stop dragging
+        }
+    }
 
     // Internal methods
     Block.prototype.insertPorts = function() {
@@ -359,6 +333,17 @@
         }
 
         return fo;
+    }
+
+
+    function findDatasetValue(element, name) {
+        var value = element && element.dataset[name];
+
+        if (!value && element.parentNode.nodeName !== 'foreignObject') {
+            value = findDatasetValue(element.parentNode, name);
+        }
+
+        return value;
     }
 
     app.Block = Block;

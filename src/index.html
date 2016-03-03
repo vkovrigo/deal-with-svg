@@ -83,6 +83,63 @@
         <div class="form-edit form-edit-say hidden" tabindex="1">
             <textarea autofocus="true" rows="4" placeholder="Please type message"></textarea>
         </div>
+        <script id="inputs-template" type="x-tmpl-mustache">
+            <div class="wrapper wrapper-input">
+                {{#values}}
+                    <div class="value value-input truncate" data-value-id="{{id}}">
+                        <span>{{text}}</span>
+                        <div class="controls controls-input">
+                            <div class="control" data-action="edit">
+                                <i class="fa fa-pencil"></i>
+                            </div>
+                            <div class="control" data-action="remove">
+                                <i class="fa fa-times"></i>
+                            </div>
+                        </div>
+                    </div>
+                {{/values}}
+                <div class="btn-add btn-add-input" data-action="add">
+                    <i class="fa fa-plus"></i>
+                </div>
+                <div class="error-input">?</div>
+            </div>
+        </script>
+        <script type="x-tmpl-mustache" id="converters-template">
+            <div class="wrapper wrapper-converter">
+                {{#values}}
+                    <div class="value value-converter" data-value-id="{{id}}">
+                        <div class="from truncate"><span>{{from}}</span></div>
+                        <div class="arrow"><i class="fa fa-long-arrow-right"></i></div>
+                        <div class="to truncate"><span>{{to}}</span></div>
+                        <div class="controls controls-converter">
+                            <div class="control" data-action="edit">
+                                <i class="fa fa-pencil"></i>
+                            </div>
+                            <div class="control" data-action="remove">
+                                <i class="fa fa-times"></i>
+                            </div>
+                        </div>
+                    </div>
+                {{/values}}
+                <div class="btn-add btn-add-converter" data-action="add">
+                    <i class="fa fa-plus"></i>
+                </div>
+            </div>
+        </script>
+        <script id="say-template" type="x-tmpl-mustache">
+            <div class="wrapper wrapper-say" style="max-height: {{maxHeight}}px">
+                {{#values}}
+                    <div class="value value-say" data-value-id="{{id}}">
+                        <span>{{message}}</span>
+                        <div class="controls controls-input">
+                            <div class="control" data-action="edit">
+                                <i class="fa fa-pencil"></i>
+                            </div>
+                        </div>
+                    </div>
+                {{/values}}
+            </div>
+        </script>
         <script type="text/javascript">
             var app = {};
         </script>
