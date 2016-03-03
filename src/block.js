@@ -111,6 +111,12 @@
                 .on('mousedown', d => this.editing(d));
         }
 
+        let headerTemplate = document.getElementById('block-header').textContent;
+
+        this.group.append('foreignObject')
+            .attr('width', width)
+            .html(Mustache.render(headerTemplate, { type: this.type }));
+
         this.insertPorts();
     };
 

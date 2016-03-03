@@ -1,5 +1,7 @@
+@border-color: #8A8A8A;
+
 .wrapper {
-    border: 1px solid;
+    border: 1px solid @border-color;
     display: flex;
     width:  100%;
 }
@@ -26,12 +28,12 @@
 }
 
 .value-input {
-    border-right: 1px solid;
+    border-right: 1px solid @border-color;
     text-align: center;
 }
 
 .value-converter {
-    border-bottom: 1px solid;
+    border-bottom: 1px solid @border-color;
 }
 
 .value-converter .from, .value-converter .to {
@@ -95,4 +97,10 @@
 .btn-add-converter {
     margin-left: 10%;
     margin-top: -16px;
+}
+
+.block-header {
+    padding-top: 13px;
+    text-align: center;
+    border-bottom: 1px solid @border-color;
 }
