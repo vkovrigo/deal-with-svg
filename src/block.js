@@ -15,11 +15,24 @@
     var Block = function(options) {
         var self = this;
 
+        this.type = options.vertex.type;
+
         //Default block width and height;
         this.inputValueWidth = 100;
-        var width = 200,
-            height = 100,
-            inputErroeWidth = 40,
+
+        var height, width;
+        switch (this.type) {
+            case Block.type.start:
+            case Block.type.finish:
+                height = 50;
+                width = 150;
+                break;
+            default:
+                height = 100;
+                width = 200
+        }
+
+        var inputErroeWidth = 40,
             converterValueHeight = 51,
             converterHeaderHeight = height - converterValueHeight;
 
@@ -43,8 +56,6 @@
         );
 
         this.id = options.vertex.id || idGenerator();
-
-        this.type = options.vertex.type;
 
         this.group = options.container
             .append('g').attr('class', 'block-wrapper') // ?? Extra wrapper for separating data from vertices list and bind this to current block
